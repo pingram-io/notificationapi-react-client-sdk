@@ -207,23 +207,30 @@ export function SlackConnect({
       setError(null);
 
       let formattedChannel: string;
+      const trimmedValue = selectedChannel.trim();
+      const isSlackId = /^[CDGUWTE][A-Z0-9]{8,}$/i.test(trimmedValue);
 
-      // Check if selectedChannel is an ID (from dropdown selection)
-      const channelInfo = channels.find((c) => c.id === selectedChannel);
+      // Check if selectedChannel is an ID or a name already in our list
+      const channelInfo = channels.find(
+        (c) =>
+          c.id === trimmedValue ||
+          c.name.toLowerCase() === trimmedValue.toLowerCase()
+      );
 
       if (channelInfo) {
-        // User selected from dropdown - format as #channelname or @username
+        // If we found it in the list, use the formatted name (#channel or @user)
         formattedChannel = `${channelInfo.type === 'channel' ? '#' : '@'}${channelInfo.name}`;
       } else if (
-        selectedChannel.startsWith('#') ||
-        selectedChannel.startsWith('@')
+        trimmedValue.startsWith('#') ||
+        trimmedValue.startsWith('@') ||
+        isSlackId
       ) {
-        // User typed a custom value with proper prefix (freeSolo mode)
-        formattedChannel = selectedChannel;
+        // User typed a custom value with proper prefix or a Slack ID
+        formattedChannel = trimmedValue;
       } else {
         // Invalid format - show error
         setError(
-          'Please enter a channel as #channel-name or user as @username'
+          'Please enter a #channel-name, @username, or a Slack ID (e.g. C12345678)'
         );
         setLoading(false);
         return;
@@ -282,20 +289,28 @@ export function SlackConnect({
 
     // Parse the slackChannel to find the matching channel ID
     if (slackChannel) {
-      const isChannel = slackChannel.startsWith('#');
-      const channelName = slackChannel.substring(1); // Remove # or @
-      const channelType = isChannel ? 'channel' : 'user';
+      const isSlackId = /^[CDGUWTE][A-Z0-9]{8,}$/i.test(slackChannel);
 
-      // Find the channel ID that matches the name and type
-      const matchingChannel = channelsList.find(
-        (c) => c.name === channelName && c.type === channelType
-      );
+      if (isSlackId) {
+        setSelectedChannel(slackChannel);
+      } else if (slackChannel.startsWith('#') || slackChannel.startsWith('@')) {
+        const isChannel = slackChannel.startsWith('#');
+        const channelName = slackChannel.substring(1); // Remove # or @
+        const channelType = isChannel ? 'channel' : 'user';
 
-      if (matchingChannel) {
-        setSelectedChannel(matchingChannel.id);
+        // Find the channel ID that matches the name and type
+        const matchingChannel = channelsList.find(
+          (c) => c.name === channelName && c.type === channelType
+        );
+
+        if (matchingChannel) {
+          setSelectedChannel(matchingChannel.id);
+        } else {
+          // Channel not found in list (possibly due to pagination)
+          // Set the formatted channel string directly for freeSolo mode
+          setSelectedChannel(slackChannel);
+        }
       } else {
-        // Channel not found in list (possibly due to pagination)
-        // Set the formatted channel string directly for freeSolo mode
         setSelectedChannel(slackChannel);
       }
     }
@@ -382,7 +397,7 @@ export function SlackConnect({
             </Typography>
             <Autocomplete
               disablePortal
-              freeSolo={hasMoreChannels || hasMoreUsers}
+              freeSolo
               id="slack-channel-select"
               slots={{
                 paper: ({ children, ...props }) => (
@@ -433,11 +448,8 @@ export function SlackConnect({
               size="small"
               value={
                 channels.find((c) => c.id === selectedChannel) ||
-                (selectedChannel &&
-                (selectedChannel.startsWith('#') ||
-                  selectedChannel.startsWith('@'))
-                  ? selectedChannel
-                  : null)
+                selectedChannel ||
+                null
               }
               onChange={(_, newValue) => {
                 if (typeof newValue === 'string') {
@@ -449,12 +461,7 @@ export function SlackConnect({
                 }
               }}
               onInputChange={(_, newInputValue, reason) => {
-                if (
-                  (hasMoreChannels || hasMoreUsers) &&
-                  reason === 'input' &&
-                  (newInputValue.startsWith('#') ||
-                    newInputValue.startsWith('@'))
-                ) {
+                if (reason === 'input') {
                   setSelectedChannel(newInputValue);
                 }
               }}
