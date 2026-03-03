@@ -63,7 +63,7 @@
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/notificationapi-com/notificationapi-react-client-sdk"
+    "url": "https://github.com/pingram-io/notificationapi-react-client-sdk"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
