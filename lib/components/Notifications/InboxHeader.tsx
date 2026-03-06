@@ -28,7 +28,7 @@ export const InboxHeader = (props: InboxHeaderProps) => {
             <IconButton
               size="small"
               onClick={() => {
-                props.button1ClickHandler && props.button1ClickHandler('ALL');
+                props.button1ClickHandler?.('ALL');
               }}
             >
               <DoneAll fontSize="small" />
