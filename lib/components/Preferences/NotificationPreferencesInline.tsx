@@ -8,7 +8,7 @@ import { getThemeColors } from '../../utils/theme';
 type NotificationPreferencesInlineProps = object;
 
 export function NotificationPreferencesInline(
-  props: NotificationPreferencesInlineProps
+  _props: NotificationPreferencesInlineProps
 ) {
   const context = useContext(NotificationAPIContext);
   const theme = useTheme();
@@ -17,7 +17,6 @@ export function NotificationPreferencesInline(
   if (!context) {
     return null;
   }
-  props;
   return (
     <div
       style={{
