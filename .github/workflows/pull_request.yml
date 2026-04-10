@@ -16,7 +16,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Install dependencies
         run: npm install
@@ -26,6 +26,13 @@ jobs:
 
       - name: Run ESLint
         run: npm run lint
+
+      - name: Package Cooldown Check
+        run: node .github/scripts/check-package-cooldown.js
+        env:
+          GITHUB_BASE_REF: ${{ github.base_ref }}
+          COOLDOWN_DAYS: "7"
+          LOCKFILE_PATHS: "package-lock.json"
 
       - name: Build Project
         run: npm run build
