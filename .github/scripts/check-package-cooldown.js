@@ -15,7 +15,7 @@ import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 
-const COOLDOWN_DAYS = parseInt(process.env.COOLDOWN_DAYS || '7', 10);
+const COOLDOWN_DAYS = parseInt(process.env.COOLDOWN_DAYS || '6', 10);
 const LOCKFILE_PATHS = (
   process.env.LOCKFILE_PATHS || 'package-lock.json'
 ).split(',');
