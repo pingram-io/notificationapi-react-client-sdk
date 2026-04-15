@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "description": "Packages allowed to bypass the 7-day cooldown check. Use sparingly and document why.",
+  "description": "Packages allowed to bypass the 6-day cooldown check. Use sparingly and document why.",
   "allowlist": [
     {
       "name": "@notificationapi/core",
