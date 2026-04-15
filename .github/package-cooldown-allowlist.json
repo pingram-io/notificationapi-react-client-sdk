@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Packages allowed to bypass the 7-day cooldown check. Use sparingly and document why.",
+  "allowlist": [
+    {
+      "name": "@notificationapi/core",
+      "version": "1.2.1",
+      "reason": "Required for NotificationAPI React Client SDK, internal dependency",
+      "approvedBy": "millerm30",
+      "approvedAt": "2026-04-15"
+    }
+  ]
+}
