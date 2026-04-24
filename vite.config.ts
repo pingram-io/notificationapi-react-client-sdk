@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { glob } from 'glob';
 import react from '@vitejs/plugin-react';
 import dts from 'vite-plugin-dts';
+import { esmExternalRequirePlugin } from 'rolldown/plugins';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -17,8 +18,14 @@ export default defineConfig({
       entry: resolve(__dirname, 'lib/main.ts'),
       formats: ['es']
     },
-    rollupOptions: {
-      external: ['react', 'react/jsx-runtime'],
+    rolldownOptions: {
+      external: ['react', 'react-dom', 'react/jsx-runtime'],
+      plugins: [
+        esmExternalRequirePlugin({
+          external: [/^react(-dom)?(\/.+)?$/],
+          skipDuplicateCheck: true
+        })
+      ],
       input: Object.fromEntries(
         // https://rollupjs.org/configuration-options/#input
         glob
