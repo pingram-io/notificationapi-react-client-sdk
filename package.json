@@ -74,7 +74,7 @@
     "@mui/material": "^6.3.1",
     "@notificationapi/core": "^1.2.1",
     "javascript-time-ago": "^2.5.10",
-    "liquidjs": "^10.25.5",
+    "liquidjs": "^10.25.7",
     "rc-virtual-list": "^3.11.5",
     "react-time-ago": "^7.3.3"
   }
