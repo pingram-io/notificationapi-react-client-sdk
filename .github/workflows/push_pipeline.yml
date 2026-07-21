@@ -12,6 +12,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
+      actions: read
 
     outputs:
       releaseType: ${{ steps.publish.outputs.type }}
@@ -65,7 +66,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_FAILED_WEBHOOK_URL }}
 
       - name: Update npm
-        run: npm install -g npm@latest
+        run: npm install -g npm@11.18.0
 
       - name: Publish to npm
         id: publish
