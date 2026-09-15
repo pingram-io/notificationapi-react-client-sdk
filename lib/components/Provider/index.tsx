@@ -12,8 +12,7 @@ import {
   GetPreferencesResponse,
   InAppNotification,
   User,
-  UserAccountMetadata,
-  PushSubscription
+  UserAccountMetadata
 } from '@notificationapi/core/dist/interfaces';
 import {
   BaseDeliveryOptions,
@@ -48,15 +47,10 @@ type Props = (
   playSoundOnNewNotification?: boolean;
   newNotificationSoundPath?: string;
   client?: typeof NotificationAPIClientSDK;
-  webPushOptInMessage?: 'AUTOMATIC' | boolean;
-  customServiceWorkerPath?: string;
   debug?: boolean;
   onNewNotifications?: (notifications: InAppNotification[]) => void;
   theme?: NotificationAPITheme;
 };
-
-// Ensure that the code runs only in the browser
-const isClient = typeof window !== 'undefined';
 
 export const NotificationAPIProvider: React.FunctionComponent<
   PropsWithChildren<Props>
@@ -82,9 +76,7 @@ export const NotificationAPIProvider: React.FunctionComponent<
     initialLoadMaxAge: new Date(new Date().setMonth(new Date().getMonth() - 3)),
     playSoundOnNewNotification: false,
     newNotificationSoundPath:
-      'https://proxy.notificationsounds.com/notification-sounds/elegant-notification-sound/download/file-sounds-1233-elegant.mp3',
-    webPushOptInMessage: 'AUTOMATIC' as 'AUTOMATIC' | boolean,
-    customServiceWorkerPath: '/notificationapi-service-worker.js'
+      'https://proxy.notificationsounds.com/notification-sounds/elegant-notification-sound/download/file-sounds-1233-elegant.mp3'
   };
 
   const config = {
@@ -103,10 +95,6 @@ export const NotificationAPIProvider: React.FunctionComponent<
   const [loadingNotifications, setLoadingNotifications] = useState(false);
   const [oldestLoaded, setOldestLoaded] = useState(new Date().toISOString());
   const [hasMore, setHasMore] = useState(true);
-  const [webPushOptInMessage, setWebPushOptInMessage] = useState<
-    'AUTOMATIC' | boolean
-  >(config.webPushOptInMessage);
-  const [webPushOptIn, setWebPushOptIn] = useState<boolean>(false);
 
   const playSound = useCallback(() => {
     if (config.playSoundOnNewNotification) {
@@ -617,121 +605,6 @@ export const NotificationAPIProvider: React.FunctionComponent<
     }
   };
 
-  /**
-   * Asks the user for permission to send web push notifications and subscribes to the push service if granted.
-   *
-   * @callback askForWebPushPermission
-   *
-   * @throws Will log an error code if the service worker registration or push subscription fails.
-   *
-   * Possible error codes:
-   * - `18`: The operation is insecure. This typically occurs if the code is run in an insecure context (e.g., not over HTTPS).
-   * - `19`: The operation is aborted. This can happen if the user denies the permission request.
-   * - `20`: The operation is invalid. This can occur if the provided application server key is invalid.
-   * - `21`: The operation is not allowed. This can happen if the user has blocked notifications for the site.
-   * - `22`: The operation is not supported. This can occur if the browser does not support the required features.
-   *
-   * @dependencies
-   * - `client`: The client instance used to identify the user with the web push tokens.
-   * - `config.customServiceWorkerPath`: The path to the custom service worker script.
-   * - `userAccountMetaData?.userAccountMetadata.environmentVapidPublicKey`: The VAPID public key for the environment.
-   */
-  const askForWebPushPermission = useCallback((): void => {
-    debug.group('Requesting web push permission');
-    debug.log('Service worker support check', {
-      supported: 'serviceWorker' in navigator,
-      customServiceWorkerPath: config.customServiceWorkerPath
-    });
-
-    if ('serviceWorker' in navigator) {
-      debug.log('Registering service worker');
-      navigator.serviceWorker
-        .register(config.customServiceWorkerPath)
-        .then(async (registration) => {
-          debug.log('Service worker registered successfully');
-          setWebPushOptInMessage(false);
-          requestNotificationPermission().then(async (permission) => {
-            debug.log('Notification permission result', { permission });
-            if (permission === 'granted') {
-              debug.log('Permission granted, subscribing to push manager');
-              await registration.pushManager
-                .subscribe({
-                  userVisibleOnly: true,
-                  applicationServerKey:
-                    userAccountMetaData?.userAccountMetadata
-                      .environmentVapidPublicKey
-                })
-                .then(async (res) => {
-                  debug.log('Push subscription successful');
-                  const body = {
-                    webPushTokens: [
-                      {
-                        sub: {
-                          endpoint: res.toJSON().endpoint as string,
-                          keys: res.toJSON().keys as PushSubscription['keys']
-                        }
-                      }
-                    ]
-                  };
-                  debug.log('Identifying user with web push tokens');
-                  await client.identify(body);
-                  localStorage.setItem('hideWebPushOptInMessage', 'true');
-                  debug.log('Web push setup completed successfully');
-                  debug.groupEnd();
-                });
-            } else if (permission === 'denied') {
-              debug.warn('Permission for notifications was denied');
-              console.log('Permission for notifications was denied');
-              debug.groupEnd();
-            }
-          });
-        })
-        .catch((e) => {
-          debug.error(
-            'Service worker registration or push subscription failed',
-            e,
-            {
-              errorCode: e.code,
-              customServiceWorkerPath: config.customServiceWorkerPath
-            }
-          );
-
-          if (e.code === 18) {
-            console.error(
-              'NotificationAPI guide: Probably you are not setup the service worker correctly. Please check the documentation at https://docs.notificationapi.com/guides/web-push#step-by-step-implementation Step 3: Service Worker Setup.'
-            );
-          } else if (e.code === 19) {
-            console.error(
-              'The operation is aborted. This can happen if the user denies the permission request.'
-            );
-          } else if (e.code === 20) {
-            console.error(
-              'The operation is invalid. This can occur if the provided application server key is invalid. Please contact NotificationAPI support.'
-            );
-          } else if (e.code === 21) {
-            console.error(
-              'The operation is not allowed. This can happen if the user has blocked notifications for the site. Please check your browser site settings Notifications part.'
-            );
-          } else if (e.code === 22) {
-            console.error(
-              'The operation is not supported. This can occur if the browser does not support the required features.'
-            );
-          } else {
-            console.error(e);
-          }
-          debug.groupEnd();
-        });
-    } else {
-      debug.warn('Service worker not supported in this browser');
-      debug.groupEnd();
-    }
-  }, [
-    client,
-    config.customServiceWorkerPath,
-    userAccountMetaData?.userAccountMetadata.environmentVapidPublicKey,
-    debug
-  ]);
-
   useEffect(() => {
     debug.group('Provider initialization effect');
     debug.log('Resetting state and loading initial data');
@@ -764,7 +637,7 @@ export const NotificationAPIProvider: React.FunctionComponent<
         debug.error('Failed to fetch initial preferences', error);
         debug.groupEnd();
       });
-  }, [client, loadNotifications, askForWebPushPermission, debug]);
+  }, [client, loadNotifications, debug]);
 
   useEffect(() => {
     debug.group('Fetching user account metadata');
@@ -772,36 +645,9 @@ export const NotificationAPIProvider: React.FunctionComponent<
       .getUserAccountMetadata()
       .then((res) => {
         debug.log('User account metadata loaded', {
-          hasWebPushEnabled: res.userAccountMetadata.hasWebPushEnabled,
-          environmentVapidPublicKey: res.userAccountMetadata
-            .environmentVapidPublicKey
-            ? 'present'
-            : 'missing'
+          hasLogo: !!res.userAccountMetadata?.logo
         });
         setUserAccountMetaData(res);
-        if (
-          isClient &&
-          'Notification' in window &&
-          typeof Notification.requestPermission === 'function'
-        ) {
-          debug.log('Browser notification support detected', {
-            permission: Notification.permission
-          });
-          if (Notification.permission !== 'default') {
-            debug.log(
-              'Setting webPushOptInMessage to false (permission already set)'
-            );
-            setWebPushOptInMessage(false);
-          }
-        } else {
-          debug.log(
-            'Browser notification not supported, using server setting',
-            {
-              hasWebPushEnabled: res.userAccountMetadata.hasWebPushEnabled
-            }
-          );
-          setWebPushOptInMessage(res.userAccountMetadata.hasWebPushEnabled);
-        }
         debug.groupEnd();
       })
       .catch((error) => {
@@ -810,38 +656,10 @@ export const NotificationAPIProvider: React.FunctionComponent<
       });
   }, [client, debug]);
 
-  useEffect(() => {
-    debug.group('Handling webPushOptInMessage state');
-    debug.log('webPushOptInMessage value', webPushOptInMessage);
-
-    if (webPushOptInMessage === 'AUTOMATIC') {
-      const hideMessage =
-        localStorage.getItem('hideWebPushOptInMessage') === 'true';
-      debug.log('Automatic mode - checking localStorage', {
-        hideMessage,
-        shouldShow: !hideMessage
-      });
-      setWebPushOptInMessage(!hideMessage);
-    }
-    debug.groupEnd();
-  }, [webPushOptInMessage, debug]);
-
-  useEffect(() => {
-    debug.group('Handling webPushOptIn state');
-    debug.log('webPushOptIn state', webPushOptIn);
-
-    if (webPushOptIn) {
-      debug.log('User opted in for web push, requesting permission');
-      askForWebPushPermission();
-    }
-    debug.groupEnd();
-  }, [webPushOptIn, askForWebPushPermission, debug]);
-
   const value: Context = {
     notifications,
     preferences,
     userAccountMetaData,
-    webPushOptInMessage,
     loadNotifications,
     markAsOpened,
     markAsArchived,
@@ -849,17 +667,13 @@ export const NotificationAPIProvider: React.FunctionComponent<
     markAsClicked,
     updateDelivery,
     updateDeliveries,
-    getClient: () => client,
-    setWebPushOptInMessage,
-    setWebPushOptIn
+    getClient: () => client
   };
 
   debug.log('NotificationAPI Provider rendering', {
     notificationsCount: notifications?.length || 0,
     hasPreferences: !!preferences,
-    hasUserAccountMetaData: !!userAccountMetaData,
-    webPushOptInMessage,
-    webPushOptIn
+    hasUserAccountMetaData: !!userAccountMetaData
   });
 
   // Create MUI theme from theme prop
@@ -887,23 +701,3 @@ const useNotificationAPIContext = (): Context => {
   return context;
 };
 NotificationAPIProvider.useNotificationAPIContext = useNotificationAPIContext;
-
-const requestNotificationPermission =
-  async (): Promise<NotificationPermission> => {
-    if (
-      isClient &&
-      'Notification' in window &&
-      typeof Notification.requestPermission === 'function'
-    ) {
-      try {
-        const permission = await Notification.requestPermission();
-        return permission;
-      } catch (error) {
-        console.error('Error requesting notification permission:', error);
-        return 'default';
-      }
-    } else {
-      console.warn('Web Push Notifications are not supported in this browser.');
-      return 'default';
-    }
-  };

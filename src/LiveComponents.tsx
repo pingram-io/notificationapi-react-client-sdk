@@ -6,8 +6,7 @@ import {
   NotificationCounter,
   NotificationAPIProvider,
   NotificationPreferencesPopup,
-  NotificationPreferencesInline,
-  SlackConnect
+  NotificationPreferencesInline
 } from '../lib/main';
 import {
   Button,
@@ -144,9 +143,6 @@ const LiveComponents: React.FC<LiveComponentsProps> = ({
             playSoundOnNewNotification={true}
             debug={debugMode}
           >
-            <h2>Slack Connect:</h2>
-            <SlackConnect />
-
             <h2>Popup:</h2>
             <NotificationPopup />
 

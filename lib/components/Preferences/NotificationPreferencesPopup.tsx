@@ -2,7 +2,6 @@ import { useContext } from 'react';
 import { Preferences } from './Preferences';
 import { NotificationAPIContext } from '../Provider/context';
 import { Dialog, DialogTitle, DialogContent, useTheme } from '@mui/material';
-import WebPushOptInMessage from '../WebPush/WebPushOptInMessage';
 import { getThemeColors } from '../../utils/theme';
 
 type NotificationPreferencesPopupProps = {
@@ -50,14 +49,6 @@ export function NotificationPreferencesPopup(
         sx={{ backgroundColor: themeColors.paper, color: themeColors.text }}
       >
         <Preferences />
-        {context.webPushOptInMessage && (
-          <div>
-            <WebPushOptInMessage
-              hideAfterInteraction={false}
-              descriptionStyle={{ fontSize: 12 }}
-            />
-          </div>
-        )}
       </DialogContent>
     </Dialog>
   );
