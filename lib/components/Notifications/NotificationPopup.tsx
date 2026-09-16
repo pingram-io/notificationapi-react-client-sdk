@@ -7,9 +7,8 @@ import { InAppNotification } from '@notificationapi/core/dist/interfaces';
 import { NotificationPreferencesPopup } from '../Preferences';
 import { InboxHeaderProps } from './InboxHeader';
 import { Filter, Pagination } from './interface';
-import { Divider, IconButton, Popover, useTheme } from '@mui/material';
+import { IconButton, Popover, useTheme } from '@mui/material';
 import NotificationsOutlined from '@mui/icons-material/NotificationsOutlined';
-import WebPushOptInMessage from '../WebPush/WebPushOptInMessage';
 import { getThemeColors } from '../../utils/theme';
 
 export type NotificationPopupProps = {
@@ -152,15 +151,6 @@ export const NotificationPopup: React.FC<NotificationPopupProps> = (props) => {
             header={config.header}
             newTab={config.newTab}
           />
-          {context.webPushOptInMessage &&
-            localStorage.getItem('hideWebPushOptInMessage') !== 'true' && (
-              <div>
-                <Divider
-                  style={{ margin: '10px 0', borderColor: themeColors.divider }}
-                />
-                <WebPushOptInMessage hideAfterInteraction={true} />
-              </div>
-            )}
         </div>
       </Popover>
       <NotificationPreferencesPopup

@@ -6,10 +6,7 @@ import { InboxHeaderProps } from './InboxHeader';
 import { NotificationPreferencesPopup } from '../Preferences';
 import { InAppNotification } from '@notificationapi/core/dist/interfaces';
 import { Filter, Pagination } from './interface';
-import Divider from '@mui/material/Divider';
 import { useTheme } from '@mui/material/styles';
-import WebPushOptInMessage from '../WebPush/WebPushOptInMessage';
-import Language from '@mui/icons-material/Language';
 import { getThemeColors } from '../../utils/theme';
 
 export type NotificationFeedProps = {
@@ -95,29 +92,6 @@ export const NotificationFeed: React.FC<NotificationFeedProps> = (props) => {
         imageShape={config.imageShape}
         newTab={config.newTab}
       />
-      {context.webPushOptInMessage &&
-        localStorage.getItem('hideWebPushOptInMessage') !== 'true' && (
-          <div>
-            <Divider
-              style={{ margin: '10px 0', borderColor: themeColors.divider }}
-            />
-            <WebPushOptInMessage
-              hideAfterInteraction={true}
-              icon={<Language type="text" style={{ marginLeft: '9px' }} />}
-              descriptionStyle={{
-                flexDirection: 'column', // Stack the elements vertically
-                justifyContent: 'flex-start', // Align items to the left
-                fontSize: '14px',
-                alignItems: 'flex-start' // Align items to the left
-              }}
-              buttonContainerStyle={{
-                justifyContent: 'flex-start', // Align buttons to the left
-                alignItems: 'flex-start', // Align buttons to the left
-                marginTop: '10px' // Add some space between message and buttons
-              }}
-            />
-          </div>
-        )}
       <NotificationPreferencesPopup
         open={openPreferences}
         onClose={() => setOpenPreferences(false)}
