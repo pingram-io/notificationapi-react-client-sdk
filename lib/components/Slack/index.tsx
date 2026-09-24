@@ -1,1 +1,0 @@
-export { SlackConnect } from './SlackConnect';

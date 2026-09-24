@@ -6,8 +6,7 @@ import {
   NotificationCounter,
   NotificationAPIProvider,
   NotificationPreferencesPopup,
-  NotificationPreferencesInline,
-  SlackConnect
+  NotificationPreferencesInline
 } from '../lib/main';
 import {
   Button,
@@ -57,7 +56,7 @@ const LiveComponents: React.FC<LiveComponentsProps> = ({
 }) => {
   const [clientId, setClientId] = useState('24nojpnrsdc53fkslha0roov05');
   const [userId, setUserId] = useState('sahand');
-  const [apiUrl, setApiUrl] = useState('api.notificationapi.com');
+  const [apiUrl, setApiUrl] = useState('api.pingram.io');
   const [debugMode, setDebugMode] = useState(true);
   const [error] = useState<string | null>(null);
   const [preferencesPopupVisibility, setPreferencesPopupVisiblity] =
@@ -144,9 +143,6 @@ const LiveComponents: React.FC<LiveComponentsProps> = ({
             playSoundOnNewNotification={true}
             debug={debugMode}
           >
-            <h2>Slack Connect:</h2>
-            <SlackConnect />
-
             <h2>Popup:</h2>
             <NotificationPopup />
 

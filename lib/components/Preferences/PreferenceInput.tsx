@@ -80,6 +80,10 @@ export const PreferenceInput = ({
   return (
     <>
       {(notification.channels as Channels[])
+        .filter(
+          (channel) =>
+            channel !== Channels.WEB_PUSH && channel !== Channels.SLACK
+        )
         .sort(sortChannels)
         .map((channel: Channels, i) => {
           const preference = preferences.find(

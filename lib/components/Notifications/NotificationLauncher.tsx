@@ -5,9 +5,8 @@ import { NotificationPopupProps } from './NotificationPopup';
 import { NotificationAPIContext } from '../Provider/context';
 import { NotificationPreferencesPopup } from '../Preferences';
 import { Position } from './interface';
-import { LanguageOutlined, NotificationsOutlined } from '@mui/icons-material';
-import { Divider, IconButton, Popover, useTheme } from '@mui/material';
-import WebPushOptInMessage from '../WebPush/WebPushOptInMessage';
+import { NotificationsOutlined } from '@mui/icons-material';
+import { IconButton, Popover, useTheme } from '@mui/material';
 import { getThemeColors } from '../../utils/theme';
 
 type NotificationLaucherProps = NotificationPopupProps & {
@@ -149,24 +148,6 @@ export const NotificationLauncher: React.FC<NotificationLaucherProps> = (
             header={config.header}
             newTab={config.newTab}
           />
-          {context.webPushOptInMessage &&
-            localStorage.getItem('hideWebPushOptInMessage') !== 'true' && (
-              <div>
-                <Divider
-                  style={{ margin: '10px 0', borderColor: themeColors.divider }}
-                />
-                <WebPushOptInMessage
-                  hideAfterInteraction={true}
-                  icon={
-                    <LanguageOutlined
-                      type="text"
-                      style={{ marginLeft: '9px' }}
-                    />
-                  }
-                  alertContainerStyle={{ maxWidth: '345px' }}
-                />
-              </div>
-            )}
         </div>
       </Popover>
       <NotificationPreferencesPopup

@@ -1,8 +1,7 @@
 import { useContext } from 'react';
 import { Preferences } from './Preferences';
 import { NotificationAPIContext } from '../Provider/context';
-import { Divider, useTheme } from '@mui/material';
-import WebPushOptInMessage from '../WebPush/WebPushOptInMessage';
+import { useTheme } from '@mui/material';
 import { getThemeColors } from '../../utils/theme';
 
 type NotificationPreferencesInlineProps = object;
@@ -26,28 +25,7 @@ export function NotificationPreferencesInline(
         color: themeColors.text
       }}
     >
-      <Preferences />{' '}
-      {context.webPushOptInMessage && (
-        <div>
-          <Divider
-            style={{ margin: '10px 0', borderColor: themeColors.divider }}
-          />
-          <WebPushOptInMessage
-            hideAfterInteraction={false}
-            descriptionStyle={{
-              flexDirection: 'column', // Stack the elements vertically
-              justifyContent: 'flex-start', // Align items to the left
-              fontSize: '14px',
-              alignItems: 'flex-start' // Align items to the left
-            }}
-            buttonContainerStyle={{
-              justifyContent: 'flex-start', // Align buttons to the left
-              alignItems: 'flex-start', // Align buttons to the left
-              marginTop: '10px' // Add some space between message and buttons
-            }}
-          />
-        </div>
-      )}
+      <Preferences />
     </div>
   );
 }

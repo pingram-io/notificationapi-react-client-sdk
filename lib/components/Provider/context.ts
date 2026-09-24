@@ -14,7 +14,6 @@ export type Context = {
   notifications?: InAppNotification[];
   preferences?: GetPreferencesResponse;
   userAccountMetaData?: { userAccountMetadata: UserAccountMetadata };
-  webPushOptInMessage?: 'AUTOMATIC' | boolean;
   loadNotifications: (initial?: boolean) => void;
   markAsOpened: () => void;
   markAsArchived: (ids: string[] | 'ALL') => void;
@@ -41,10 +40,6 @@ export type Context = {
     }[]
   ) => void;
   getClient: () => typeof NotificationAPIClientSDK;
-  setWebPushOptInMessage: React.Dispatch<
-    React.SetStateAction<'AUTOMATIC' | boolean>
-  >;
-  setWebPushOptIn: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export const NotificationAPIContext = createContext<Context | undefined>(
