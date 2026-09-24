@@ -4,10 +4,10 @@
   "allowlist": [
     {
       "name": "@notificationapi/core",
-      "version": "1.2.9",
+      "version": "2.0.0",
       "reason": "Required for NotificationAPI React Client SDK, internal dependency",
       "approvedBy": "millerm30",
-      "approvedAt": "2026-09-08"
+      "approvedAt": "2026-09-24"
     }
   ]
 }
