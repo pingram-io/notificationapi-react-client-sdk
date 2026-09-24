@@ -70,8 +70,8 @@ export const NotificationAPIProvider: React.FunctionComponent<
   });
 
   const defaultConfigs = {
-    apiURL: 'api.notificationapi.com',
-    wsURL: 'ws.notificationapi.com',
+    apiURL: 'api.pingram.io',
+    wsURL: 'ws.pingram.io',
     initialLoadMaxCount: 1000,
     initialLoadMaxAge: new Date(new Date().setMonth(new Date().getMonth() - 3)),
     playSoundOnNewNotification: false,
