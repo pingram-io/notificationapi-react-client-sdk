@@ -12,26 +12,26 @@ jobs:
       pull-requests: write
     if: github.event.pull_request.user.login == 'dependabot[bot]'
     steps:
-      - name: Auto-assign PR to @millerm30
+      - name: Auto-assign PR to @mbasadi
         uses: actions/github-script@v7
         with:
           script: |
-            // Auto-assign the PR to @millerm30
+            // Auto-assign the PR to @mbasadi
             await github.rest.issues.addAssignees({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              assignees: ['millerm30']
+              assignees: ['mbasadi']
             });
 
-            // Request review from @millerm30
+            // Request review from @mbasadi
             await github.rest.pulls.requestReviewers({
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: context.issue.number,
-              reviewers: ['millerm30']
+              reviewers: ['mbasadi']
             });
 
-            console.log(`Auto-assigned Dependabot PR #${context.issue.number} to @millerm30`);
+            console.log(`Auto-assigned Dependabot PR #${context.issue.number} to @mbasadi`);
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
